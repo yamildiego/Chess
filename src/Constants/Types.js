@@ -1,0 +1,7 @@
+const TYPES = {
+  SET_BOARD: "SET_BOARD",
+  SET_SELECTED: "SET_SELECTED",
+  SWITCH_PLAYER: "SWITCH_PLAYER",
+};
+
+export default TYPES;
