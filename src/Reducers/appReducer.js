@@ -18,6 +18,7 @@ const initialState = {
   letters,
   board,
   pieceSelected: null,
+  pawnToChange: null,
 };
 
 export default function appReducer(state = initialState, action = {}) {
@@ -30,6 +31,12 @@ export default function appReducer(state = initialState, action = {}) {
     }
     case TYPES.SWITCH_PLAYER: {
       return { ...state, player: state.player === "white" ? "black" : "white" };
+    }
+    case TYPES.SET_PLAYER: {
+      return { ...state, player: action.player };
+    }
+    case TYPES.SET_PAWN_TO_CHANGE: {
+      return { ...state, pawnToChange: action.pawnToChange };
     }
     default:
       return state;

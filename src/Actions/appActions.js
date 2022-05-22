@@ -1,10 +1,9 @@
 import TYPES from "../Constants/Types";
 import TYPES_OF_PIECES from "../Constants/Types_Of_Pieces";
-import getPawnMovements from "../Functions/WhereItCanMove/getPawnMovements";
-import getTowerMovements from "../Functions/WhereItCanMove/getTowerMovements";
-import getBishopMovements from "../Functions/WhereItCanMove/getBishopMovements";
-import getHorseMovements from "../Functions/WhereItCanMove/getHorseMovements";
-import getKingMovements from "../Functions/WhereItCanMove/getKingMovements";
+
+import updatePiecesCanMove from "../Functions/updatePiecesCanMove";
+
+import * as configActions from "../Actions/configActions";
 
 export const setBoard = (board) => ({
   type: TYPES.SET_BOARD,
@@ -20,21 +19,38 @@ export const switchPlayer = () => ({
   type: TYPES.SWITCH_PLAYER,
 });
 
+export const setPlayer = (player) => ({
+  type: TYPES.SET_PLAYER,
+  player,
+});
+
+export const setPawnToChange = (pawnToChange) => ({
+  type: TYPES.SET_PAWN_TO_CHANGE,
+  pawnToChange,
+});
+
 export const movePiece = (oldBoard, positionItem, x, y) => {
   return async (dispatch) => {
     let board = [...oldBoard];
     board[x][y] = { ...oldBoard[positionItem[0]][positionItem[1]] };
     board[positionItem[0]][positionItem[1]] = null;
 
-    dispatch(updatePiecesCanMove(board));
+    let newBoard = updatePiecesCanMove(board, [x, y], true);
+    dispatch(setBoard(newBoard));
 
-    // dispatch(switchPlayer());
+    let item = newBoard[positionItem[0]][positionItem[1]];
+
+    // if (item && item.type === TYPES_OF_PIECES.PAWN && ((item.color === "white" && y === 7) || (item.color === "black" && y === 0)))
+    checkIfNeedToSwitchPawn(newBoard, [x, y], dispatch);
+    // else {
+    // }
   };
 };
 
 export const newGame = (boardEmpty) => {
   return async (dispatch) => {
     dispatch(setSelected(null));
+    dispatch(setPlayer("white"));
 
     let pawn = { type: TYPES_OF_PIECES.PAWN, color: "white", whereItCanMove: [] };
     let tower = { type: TYPES_OF_PIECES.TOWER, color: "white", whereItCanMove: [] };
@@ -54,90 +70,33 @@ export const newGame = (boardEmpty) => {
       [tower, pawn, null, null, null, null, { ...pawn, color: "black" }, { ...tower, color: "black" }],
     ];
 
-    dispatch(updatePiecesCanMove(board));
+    dispatch(setBoard(updatePiecesCanMove(board)));
   };
 };
 
-export const updatePiecesCanMove = (oldBoard) => {
+const checkIfNeedToSwitchPawn = (board, position, dispatch, replace = null) => {
+  let item = board[position[0]][position[1]];
+  if (
+    item &&
+    item.type === TYPES_OF_PIECES.PAWN &&
+    ((item.color === "white" && position[1] === 7) || (item.color === "black" && position[1] === 0))
+  ) {
+    if (replace === null) {
+      dispatch(configActions.setModalSwitchPawnOpen(true));
+      dispatch(setPawnToChange(position));
+    }
+  } else dispatch(switchPlayer());
+};
+
+const SwitchPawn = (board, position, dispatch, replace) => {
+  board[position[0]][position[1]] = replace;
+  dispatch(setBoard(updatePiecesCanMove(board)));
+  dispatch(configActions.setModalSwitchPawnOpen(false));
+  dispatch(switchPlayer());
+};
+
+export const setNewPiece = (board, position, item) => {
   return async (dispatch) => {
-    let board = [];
-    console.log(oldBoard);
-    console.log(oldBoard);
-    console.log(oldBoard);
-    console.log(oldBoard);
-    console.log(oldBoard);
-    console.log(oldBoard);
-    console.log(oldBoard);
-    oldBoard.forEach((row, indexX) => {
-      let newRow = [];
-      row.forEach((item, indexY) => {
-        let newItem = null;
-        if (item !== null) newItem = { ...item, whereItCanMove: getWherePieceCanMove(oldBoard, item, indexX, indexY) };
-        newRow.push(newItem);
-      });
-      board.push(newRow);
-    });
-
-    dispatch(setBoard(board));
+    SwitchPawn(board, position, dispatch, item);
   };
 };
-
-const getWherePieceCanMove = (board, item, indexX, indexY) => {
-  let whereItCanMove = [];
-  switch (item.type) {
-    case TYPES_OF_PIECES.PAWN:
-      whereItCanMove = getPawnMovements(board, item, indexX, indexY);
-      break;
-    case TYPES_OF_PIECES.TOWER:
-      whereItCanMove = getTowerMovements(board, item, indexX, indexY);
-      break;
-    case TYPES_OF_PIECES.BISHOP:
-      whereItCanMove = getBishopMovements(board, item, indexX, indexY);
-      break;
-    case TYPES_OF_PIECES.QUEEN:
-      whereItCanMove = getBishopMovements(board, item, indexX, indexY).concat(getTowerMovements(board, item, indexX, indexY));
-      break;
-    case TYPES_OF_PIECES.HORSE:
-      whereItCanMove = getHorseMovements(board, item, indexX, indexY);
-      break;
-    case TYPES_OF_PIECES.KING:
-      whereItCanMove = getKingMovements(board, item, indexX, indexY);
-      break;
-    default:
-      break;
-  }
-  return whereItCanMove;
-};
-
-// const isItInCheck = (board, item, index) => {
-//   let king = getTheKingPosition(board, item.color);
-//   let x = 0;
-//   let y = 0;
-//   let isItInCheck = false;
-
-//   while (isItInCheck === false && x < 7) {
-//     while (isItInCheck === false && y < 7) {
-//       let item = board[x][y];
-//       if (item && item.whereItCanMove.includes(king)) isItInCheck = true;
-//       y += 1;
-//     }
-//     x += 1;
-//   }
-// };
-
-// const getTheKingPosition = (board, color) => {
-//   let king = null;
-//   let x = 0;
-//   let y = 0;
-
-//   while (king === null && x < 7) {
-//     while (king === null && y < 7) {
-//       let item = board[x][y];
-//       if (item && item.color === color && item.type === TYPES_OF_PIECES.KING) king = `${x}|${y}`;
-//       y += 1;
-//     }
-//     x += 1;
-//   }
-
-//   return king;
-// };

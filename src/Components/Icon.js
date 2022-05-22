@@ -17,45 +17,31 @@ const pieces = {
 
 const Icon = (props) => {
   return (
-    <Box
-      sx={{
-        position: "absolute",
-        top: 70 * (7 - props.y),
-        width: "70px",
-        height: "70px",
-        justifyContent: "center",
-        display: "flex",
-        flexDirection: "column",
-        transform: `rotate(${props.deg}deg)`,
-        transition: "all 0.5s ease",
-      }}
-    >
-      <Box sx={{ position: "relative" }}>
-        <FontAwesomeIcon
-          style={{
-            position: "relative",
-            fontSize: "35px",
-            textAlign: "center",
-            width: "100%",
-            color: props.item.color === "black" ? "#222" : "white",
-            zIndex: 2,
-          }}
-          icon={pieces[props.item.type]}
-        />
-        <FontAwesomeIcon
-          style={{
-            position: "absolute",
-            fontSize: "36px",
-            left: 0,
-            top: 0,
-            textAlign: "center",
-            width: "100%",
-            color: props.item.color === "black" ? "white" : "#222",
-            zIndex: 0,
-          }}
-          icon={pieces[props.item.type]}
-        />
-      </Box>
+    <Box sx={{ position: "relative" }}>
+      <FontAwesomeIcon
+        style={{
+          position: "relative",
+          fontSize: "35px",
+          textAlign: "center",
+          width: "100%",
+          color: props.item.color === "black" ? "#222" : "white",
+          zIndex: 2,
+        }}
+        icon={pieces[props.item.type]}
+      />
+      <FontAwesomeIcon
+        style={{
+          position: "absolute",
+          fontSize: "36px",
+          left: 0,
+          top: 0,
+          textAlign: "center",
+          width: "100%",
+          color: props.item.color === "black" ? "white" : "#222",
+          zIndex: 0,
+        }}
+        icon={pieces[props.item.type]}
+      />
     </Box>
   );
 };

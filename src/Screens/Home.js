@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 
-// import ButtonGroup from "@mui/material/ButtonGroup";
-// import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 
 import Icon from "../Components/Icon";
+import SwitchPawn from "../Components/SwitchPawn";
+
+import getPosition from "../Functions/getPosition";
 
 import * as appActions from "../Actions/appActions";
 
@@ -17,19 +18,17 @@ import background from "../Assets/background.jpg";
 class Home extends Component {
   state = { deg: 0 };
 
+  componentDidUpdate(oldProps) {
+    if (oldProps.player !== this.props.player) this.rotate(this.props.player === "white" ? 0 : 180);
+  }
+
   newGame = () => this.props.dispatch(appActions.newGame(this.props.board));
 
-  rotate = () => this.setState({ deg: this.state.deg === 0 ? 180 : 0 });
-
-  getPosition = (xAndy) => xAndy.split("|");
+  rotate = (deg) => this.setState({ deg });
 
   getItem = (position) => (this.props.board[position[0]][position[1]] != null ? this.props.board[position[0]][position[1]] : null);
 
   handleOnClick = (item, x, y) => {
-    console.log(this.props.pieceSelected);
-    console.log(item);
-    console.log(x);
-    console.log(y);
     if (item !== null) {
       if (this.props.pieceSelected !== null) {
         if (item.color === this.props.player) {
@@ -44,7 +43,7 @@ class Home extends Component {
   };
 
   checkIfIsMoving = (item, x, y) => {
-    let positionOldItem = this.getPosition(this.props.pieceSelected);
+    let positionOldItem = getPosition(this.props.pieceSelected);
     let oldItem = this.getItem(positionOldItem);
 
     if (oldItem !== null && oldItem.whereItCanMove.includes(`${x}|${y}`)) {
@@ -56,7 +55,7 @@ class Home extends Component {
   render() {
     let whereItCanMove = [];
     if (this.props.pieceSelected !== null) {
-      let position = this.getPosition(this.props.pieceSelected);
+      let position = getPosition(this.props.pieceSelected);
       let itemSelected = this.getItem(position);
       whereItCanMove = itemSelected !== null ? itemSelected.whereItCanMove : [];
     }
@@ -69,39 +68,50 @@ class Home extends Component {
         >
           New game
         </div>
-        <div
-          style={{ position: "absolute", zIndex: 10, color: "red", fontSize: "25px", top: "200px", background: "white" }}
-          onClick={this.rotate}
-        >
-          Rotate
-        </div>
-        <Box sx={{ transform: `rotate(${this.state.deg}deg)` }}>
+        <SwitchPawn />
+
+        <Box sx={this.props.rotateBoard ? { transform: `rotate(${this.state.deg}deg)`, transition: "all 0.5s ease" } : {}}>
           <Box sx={styles.board}>
             <Box sx={styles.framework}>
               {this.props.board.map((row, indexX) => {
                 return (
-                  <Stack direction="row" key={indexX}>
-                    <Stack direction="column-reverse">
-                      {row.map((item, indexY) => {
-                        return (
-                          <Box
-                            key={indexY}
-                            onClick={() => this.handleOnClick(item, indexX, indexY)}
-                            sx={
-                              (indexX + indexY) % 2 === 0
-                                ? {
-                                    ...styles.box,
-                                    background: whereItCanMove.includes(`${indexX}|${indexY}`) ? "red" : `url('${white}')`,
-                                  }
-                                : { ...styles.box, background: whereItCanMove.includes(`${indexX}|${indexY}`) ? "red" : `url('${black}')` }
-                            }
-                          >
-                            {`${indexX}|${indexY}`}
-                            {item && <Icon item={item} deg={this.state.deg} x={indexX} y={indexY} />}
-                          </Box>
-                        );
-                      })}
-                    </Stack>
+                  <Stack direction="column-reverse" key={indexX}>
+                    {row.map((item, indexY) => {
+                      return (
+                        <Box
+                          key={indexY}
+                          onClick={() => this.handleOnClick(item, indexX, indexY)}
+                          sx={
+                            (indexX + indexY) % 2 === 0
+                              ? {
+                                  ...styles.box,
+                                  background: whereItCanMove.includes(`${indexX}|${indexY}`) ? "#c7cb67" : `url('${white}')`,
+                                }
+                              : {
+                                  ...styles.box,
+                                  background: whereItCanMove.includes(`${indexX}|${indexY}`) ? "#a4931b" : `url('${black}')`,
+                                }
+                          }
+                        >
+                          {item && (
+                            <Box
+                              sx={{
+                                position: "absolute",
+                                top: 70 * (7 - indexY),
+                                width: "70px",
+                                height: "70px",
+                                justifyContent: "center",
+                                display: "flex",
+                                flexDirection: "column",
+                                transform: this.props.rotateBoard ? `rotate(${this.state.deg}deg)` : `rotate(0deg)`,
+                              }}
+                            >
+                              <Icon item={item} />
+                            </Box>
+                          )}
+                        </Box>
+                      );
+                    })}
                   </Stack>
                 );
               })}
@@ -141,6 +151,7 @@ function mapStateToProps(state, props) {
     player: state.appReducer.player,
     board: state.appReducer.board,
     pieceSelected: state.appReducer.pieceSelected,
+    rotateBoard: state.configReducer.rotateBoard,
   };
 }
 
