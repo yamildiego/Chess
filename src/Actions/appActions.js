@@ -20,12 +20,14 @@ export const switchPlayer = () => ({
   type: TYPES.SWITCH_PLAYER,
 });
 
-export const movePiece = (board, positionItem, x, y) => {
+export const movePiece = (oldBoard, positionItem, x, y) => {
   return async (dispatch) => {
-    board[x][y] = { ...board[positionItem[0]][positionItem[1]] };
+    let board = [...oldBoard];
+    board[x][y] = { ...oldBoard[positionItem[0]][positionItem[1]] };
     board[positionItem[0]][positionItem[1]] = null;
 
-    dispatch(updateWhereItCanMove(board));
+    dispatch(updatePiecesCanMove(board));
+
     // dispatch(switchPlayer());
   };
 };
@@ -41,50 +43,36 @@ export const newGame = (boardEmpty) => {
     let queen = { type: TYPES_OF_PIECES.QUEEN, color: "white", whereItCanMove: [] };
     let king = { type: TYPES_OF_PIECES.KING, color: "white", whereItCanMove: [] };
 
-    let board = [];
+    let board = [
+      [tower, pawn, null, null, null, null, { ...pawn, color: "black" }, { ...tower, color: "black" }],
+      [horse, pawn, null, null, null, null, { ...pawn, color: "black" }, { ...horse, color: "black" }],
+      [bishop, pawn, null, null, null, null, { ...pawn, color: "black" }, { ...bishop, color: "black" }],
+      [queen, pawn, null, null, null, null, { ...pawn, color: "black" }, { ...queen, color: "black" }],
+      [king, pawn, null, null, null, null, { ...pawn, color: "black" }, { ...king, color: "black" }],
+      [bishop, pawn, null, null, null, null, { ...pawn, color: "black" }, { ...bishop, color: "black" }],
+      [horse, pawn, null, null, null, null, { ...pawn, color: "black" }, { ...horse, color: "black" }],
+      [tower, pawn, null, null, null, null, { ...pawn, color: "black" }, { ...tower, color: "black" }],
+    ];
 
-    boardEmpty.forEach((row, indexX) => {
-      let newRow = [];
-      row.forEach((item, indexY) => {
-        let newItem = null;
-        if (indexY === 1) newItem = { ...pawn };
-        if (indexY === 6) newItem = { ...pawn, color: "black" };
-
-        if (indexY === 0) {
-          if (indexX === 0 || indexX === 7) newItem = { ...tower };
-          if (indexX === 1 || indexX === 6) newItem = { ...horse };
-          if (indexX === 2 || indexX === 5) newItem = { ...bishop };
-          if (indexX === 2 || indexX === 5) newItem = { ...bishop };
-          if (indexX === 3) newItem = { ...queen };
-          if (indexX === 4) newItem = { ...king };
-        }
-        if (indexY === 7) {
-          if (indexX === 0 || indexX === 7) newItem = { ...tower, color: "black" };
-          if (indexX === 1 || indexX === 6) newItem = { ...horse, color: "black" };
-          if (indexX === 2 || indexX === 5) newItem = { ...bishop, color: "black" };
-          if (indexX === 2 || indexX === 5) newItem = { ...bishop, color: "black" };
-          if (indexX === 3) newItem = { ...queen, color: "black" };
-          if (indexX === 4) newItem = { ...king, color: "black" };
-        }
-
-        newRow.push(newItem);
-      });
-
-      board.push(newRow);
-    });
-
-    dispatch(updateWhereItCanMove(board));
+    dispatch(updatePiecesCanMove(board));
   };
 };
 
-export const updateWhereItCanMove = (oldBoard) => {
+export const updatePiecesCanMove = (oldBoard) => {
   return async (dispatch) => {
     let board = [];
+    console.log(oldBoard);
+    console.log(oldBoard);
+    console.log(oldBoard);
+    console.log(oldBoard);
+    console.log(oldBoard);
+    console.log(oldBoard);
+    console.log(oldBoard);
     oldBoard.forEach((row, indexX) => {
       let newRow = [];
       row.forEach((item, indexY) => {
         let newItem = null;
-        if (item !== null) newItem = { ...item, whereItCanMove: getWhereItCanMove(oldBoard, item, indexX, indexY) };
+        if (item !== null) newItem = { ...item, whereItCanMove: getWherePieceCanMove(oldBoard, item, indexX, indexY) };
         newRow.push(newItem);
       });
       board.push(newRow);
@@ -94,7 +82,7 @@ export const updateWhereItCanMove = (oldBoard) => {
   };
 };
 
-const getWhereItCanMove = (board, item, indexX, indexY) => {
+const getWherePieceCanMove = (board, item, indexX, indexY) => {
   let whereItCanMove = [];
   switch (item.type) {
     case TYPES_OF_PIECES.PAWN:
@@ -111,6 +99,7 @@ const getWhereItCanMove = (board, item, indexX, indexY) => {
       break;
     case TYPES_OF_PIECES.HORSE:
       whereItCanMove = getHorseMovements(board, item, indexX, indexY);
+      break;
     case TYPES_OF_PIECES.KING:
       whereItCanMove = getKingMovements(board, item, indexX, indexY);
       break;
@@ -119,3 +108,36 @@ const getWhereItCanMove = (board, item, indexX, indexY) => {
   }
   return whereItCanMove;
 };
+
+// const isItInCheck = (board, item, index) => {
+//   let king = getTheKingPosition(board, item.color);
+//   let x = 0;
+//   let y = 0;
+//   let isItInCheck = false;
+
+//   while (isItInCheck === false && x < 7) {
+//     while (isItInCheck === false && y < 7) {
+//       let item = board[x][y];
+//       if (item && item.whereItCanMove.includes(king)) isItInCheck = true;
+//       y += 1;
+//     }
+//     x += 1;
+//   }
+// };
+
+// const getTheKingPosition = (board, color) => {
+//   let king = null;
+//   let x = 0;
+//   let y = 0;
+
+//   while (king === null && x < 7) {
+//     while (king === null && y < 7) {
+//       let item = board[x][y];
+//       if (item && item.color === color && item.type === TYPES_OF_PIECES.KING) king = `${x}|${y}`;
+//       y += 1;
+//     }
+//     x += 1;
+//   }
+
+//   return king;
+// };

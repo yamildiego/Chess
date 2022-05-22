@@ -26,6 +26,10 @@ class Home extends Component {
   getItem = (position) => (this.props.board[position[0]][position[1]] != null ? this.props.board[position[0]][position[1]] : null);
 
   handleOnClick = (item, x, y) => {
+    console.log(this.props.pieceSelected);
+    console.log(item);
+    console.log(x);
+    console.log(y);
     if (item !== null) {
       if (this.props.pieceSelected !== null) {
         if (item.color === this.props.player) {
@@ -43,18 +47,18 @@ class Home extends Component {
     let positionOldItem = this.getPosition(this.props.pieceSelected);
     let oldItem = this.getItem(positionOldItem);
 
-    if (oldItem !== null && oldItem.whereICanMove.includes(`${x}|${y}`)) {
+    if (oldItem !== null && oldItem.whereItCanMove.includes(`${x}|${y}`)) {
       if (item == null || (item !== null && item.color !== this.props.player))
         this.props.dispatch(appActions.movePiece(this.props.board, positionOldItem, x, y));
     } else this.props.dispatch(appActions.setSelected(null));
   };
 
   render() {
-    let whereICanMove = [];
+    let whereItCanMove = [];
     if (this.props.pieceSelected !== null) {
       let position = this.getPosition(this.props.pieceSelected);
       let itemSelected = this.getItem(position);
-      whereICanMove = itemSelected !== null ? itemSelected.whereICanMove : [];
+      whereItCanMove = itemSelected !== null ? itemSelected.whereItCanMove : [];
     }
 
     return (
@@ -87,9 +91,9 @@ class Home extends Component {
                               (indexX + indexY) % 2 === 0
                                 ? {
                                     ...styles.box,
-                                    background: whereICanMove.includes(`${indexX}|${indexY}`) ? "red" : `url('${white}')`,
+                                    background: whereItCanMove.includes(`${indexX}|${indexY}`) ? "red" : `url('${white}')`,
                                   }
-                                : { ...styles.box, background: whereICanMove.includes(`${indexX}|${indexY}`) ? "red" : `url('${black}')` }
+                                : { ...styles.box, background: whereItCanMove.includes(`${indexX}|${indexY}`) ? "red" : `url('${black}')` }
                             }
                           >
                             {`${indexX}|${indexY}`}
