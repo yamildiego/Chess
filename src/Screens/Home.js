@@ -93,6 +93,7 @@ class Home extends Component {
                                 }
                           }
                         >
+                          {`${indexX}|${indexY}`}
                           {item && (
                             <Box
                               sx={{

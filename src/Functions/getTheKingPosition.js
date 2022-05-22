@@ -8,12 +8,10 @@ const getTheKingPosition = (board, color) => {
     let indexY = 0;
     while (king === null && indexY <= 7) {
       let item = board[indexX][indexY];
-      if (item && item.color === color && item.type === TYPES_OF_PIECES.KING) {
-        king = `${indexX}|${indexY}`;
-      }
-      indexY += 1;
+      if (item && item.color === color && item.type === TYPES_OF_PIECES.KING) king = `${indexX}|${indexY}`;
+      if (king === null) indexY += 1;
     }
-    indexX = indexX + 1;
+    if (king === null) indexX += 1;
   }
 
   return king;

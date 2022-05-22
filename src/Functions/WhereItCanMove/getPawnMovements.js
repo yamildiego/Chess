@@ -1,7 +1,3 @@
-import getPosition from "../getPosition";
-import isItInCheck from "../isItInCheck";
-import updatePiecesCanMove from "../updatePiecesCanMove";
-
 const checkPositionXYIsNotNull = (board, item, x, y) =>
   (board[x] && board[x][y] && board[x][y].color !== item.color) || (board[x] && board[x][y] && board[x][y].color !== item.color)
     ? `${x}|${y}`
