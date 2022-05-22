@@ -37,13 +37,7 @@ export const movePiece = (oldBoard, positionItem, x, y) => {
 
     let newBoard = updatePiecesCanMove(board, [x, y], true);
     dispatch(setBoard(newBoard));
-
-    let item = newBoard[positionItem[0]][positionItem[1]];
-
-    // if (item && item.type === TYPES_OF_PIECES.PAWN && ((item.color === "white" && y === 7) || (item.color === "black" && y === 0)))
     checkIfNeedToSwitchPawn(newBoard, [x, y], dispatch);
-    // else {
-    // }
   };
 };
 
@@ -71,6 +65,7 @@ export const newGame = (boardEmpty) => {
     ];
 
     dispatch(setBoard(updatePiecesCanMove(board)));
+    dispatch(configActions.setModalNewGameOpen(false));
   };
 };
 
@@ -90,8 +85,8 @@ const checkIfNeedToSwitchPawn = (board, position, dispatch, replace = null) => {
 
 const SwitchPawn = (board, position, dispatch, replace) => {
   board[position[0]][position[1]] = replace;
-  dispatch(setBoard(updatePiecesCanMove(board)));
   dispatch(configActions.setModalSwitchPawnOpen(false));
+  dispatch(setBoard(updatePiecesCanMove(board, null, true)));
   dispatch(switchPlayer());
 };
 

@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 
 import Icon from "../Components/Icon";
+import NewGame from "../Components/NewGame";
 import SwitchPawn from "../Components/SwitchPawn";
 
 import getPosition from "../Functions/getPosition";
@@ -21,8 +22,6 @@ class Home extends Component {
   componentDidUpdate(oldProps) {
     if (oldProps.player !== this.props.player) this.rotate(this.props.player === "white" ? 0 : 180);
   }
-
-  newGame = () => this.props.dispatch(appActions.newGame(this.props.board));
 
   rotate = (deg) => this.setState({ deg });
 
@@ -62,16 +61,15 @@ class Home extends Component {
 
     return (
       <div style={styles.container}>
-        <div
-          style={{ position: "absolute", zIndex: 10, color: "red", fontSize: "25px", top: "100px", background: "white" }}
-          onClick={this.newGame}
-        >
-          New game
-        </div>
+        <NewGame />
         <SwitchPawn />
-
         <Box sx={this.props.rotateBoard ? { transform: `rotate(${this.state.deg}deg)`, transition: "all 0.5s ease" } : {}}>
           <Box sx={styles.board}>
+            {!this.props.modalNewGameOpen && (
+              <Box sx={styles.containerPlayer}>
+                Player: <span style={{ textTransform: "uppercase", color: this.props.player }}>{this.props.player}</span>
+              </Box>
+            )}
             <Box sx={styles.framework}>
               {this.props.board.map((row, indexX) => {
                 return (
@@ -93,7 +91,6 @@ class Home extends Component {
                                 }
                           }
                         >
-                          {`${indexX}|${indexY}`}
                           {item && (
                             <Box
                               sx={{
@@ -128,9 +125,22 @@ const styles = {
   container: {
     display: "flex",
     backgroundImage: `url('${background}')`,
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "cover",
     height: "100vh",
     flexDirection: "column",
     justifyContent: "center",
+  },
+  containerPlayer: {
+    fontSize: "15px",
+    position: "absolute",
+    color: "white",
+    zIndex: 10,
+    fontWeight: "bold",
+    marginTop: "-40px",
+    padding: "8px",
+    borderRadius: "5px",
+    backgroundColor: "#ed6c02",
   },
   board: {
     justifyContent: "center",
@@ -153,6 +163,7 @@ function mapStateToProps(state, props) {
     board: state.appReducer.board,
     pieceSelected: state.appReducer.pieceSelected,
     rotateBoard: state.configReducer.rotateBoard,
+    modalNewGameOpen: state.configReducer.modalNewGameOpen,
   };
 }
 

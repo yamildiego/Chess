@@ -5,7 +5,6 @@ import TYPES_OF_PIECES from "../Constants/Types_Of_Pieces";
 
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 
 import Icon from "../Components/Icon";
@@ -24,20 +23,17 @@ class SwitchPawn extends Component {
     ];
 
     return (
-      <React.Fragment>
-        <div style={{ fontSize: "35px", color: "red" }}>{JSON.stringify(this.props.modalSwitchPawnOpen)}</div>
-        <Modal open={this.props.modalSwitchPawnOpen} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
-          <Box sx={style}>
-            <Stack direction={"row"} sx={{ justifyContent: "space-between" }}>
-              {items.map((item, index) => (
-                <Box key={index} onClick={() => this.setNewPiece(item)}>
-                  <Icon item={item} />
-                </Box>
-              ))}
-            </Stack>
-          </Box>
-        </Modal>
-      </React.Fragment>
+      <Modal open={this.props.modalSwitchPawnOpen} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+        <Box sx={style}>
+          <Stack direction={"row"} sx={{ justifyContent: "space-between" }}>
+            {items.map((item, index) => (
+              <Box key={index} onClick={() => this.setNewPiece(item)}>
+                <Icon item={item} />
+              </Box>
+            ))}
+          </Stack>
+        </Box>
+      </Modal>
     );
   }
 }
